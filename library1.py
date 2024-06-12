@@ -3,7 +3,7 @@ import numpy as np
 
 from scipy import interpolate
 
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 
@@ -71,7 +71,7 @@ class pipeline_model :
     preprocess_pipe = Pipeline([
         ('feature_selector', VolTempSelector('M')),
         ('missing_value', handleMissingValue()),
-        ('minmaxscaler', StandardScaler()),
         ('pca', PCA(n_components = 3)),
+        ('minmax_scaler', MinMaxScaler()),
         ('component_selector', ComponentSelector(3))
         ])
