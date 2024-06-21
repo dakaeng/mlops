@@ -48,6 +48,41 @@ class handleMissingValue(BaseEstimator, TransformerMixin) :
     return df
   
 
+# 차분
+class DiffSmooth(BaseEstimator, TransformerMixin) :
+  def __init__(self, lags_n, diffs_n, smooth_n, diffs_abs = False, abs_features = False) :
+    self.lags_n = lags_n
+    self.diffs_n = diffs_n
+    self.smooth_n = smooth_n
+    self.diffs_abs = diffs_abs
+    self.abs_features = abs_features
+
+  def fit(self, X, y = None) :
+    return self
+
+  def transform(self, X) :
+    df = X.copy()
+
+    if self.diffs_n >= 1 :
+      df = df.diff(self.diffs_n).dropna()
+      if self.diffs_abs == False :
+        df = abs(df)
+    
+    if self.smooth_n >= 2 :
+      df = df.rolling(self.smooth_n).mean().dropna()
+
+    if self.lags_n >= 1 :
+      df_columns_new = [f'{col}_lag{n}' for n in range(self.lags_n + 1) for col in df.columns]
+      df = pd.concat([df.shift(n) for n in range(self.lags_n + 1)], axis = 1).dropna()
+      df.columns = df_columns_new
+
+    df = df.reindex(sorted(df.columns), axis = 1)
+    if self.abs_features == True :
+      df = abs(df)
+    
+    return df
+  
+
 # PCA 후 n개의 주성분만 선택
 class ComponentSelector(BaseEstimator, TransformerMixin) :
   def __init__(self, n) :
@@ -69,9 +104,10 @@ class pipeline_model :
     
     # 전처리 파이프라인
     preprocess_pipe = Pipeline([
-        ('feature_selector', VolTempSelector('M')),
-        ('missing_value', handleMissingValue()),
-        ('pca', PCA(n_components = 3)),
-        ('minmax_scaler', MinMaxScaler()),
-        ('component_selector', ComponentSelector(3))
-        ])
+      ('feature_selector', VolTempSelector('M')),
+      ('missing_value', handleMissingValue()),
+      ('siff_smooth_df', DiffSmooth(0, 0, 0)),
+      ('pca', PCA(n_components = 3)),
+      ('minmax_scaler', MinMaxScaler()),
+      ('component_selector', ComponentSelector(3))
+    ])
