@@ -3,7 +3,6 @@ import numpy as np
 
 from scipy import interpolate
 
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 
@@ -108,6 +107,5 @@ class pipeline_model :
       ('missing_value', handleMissingValue()),
       ('siff_smooth_df', DiffSmooth(0, 0, 0)),
       ('pca', PCA(n_components = 3)),
-      ('minmax_scaler', MinMaxScaler()),
       ('component_selector', ComponentSelector(3))
     ])
