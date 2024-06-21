@@ -96,12 +96,9 @@ class ComponentSelector(BaseEstimator, TransformerMixin) :
   
 
 
-################################## 모델링 ##################################
 
-class pipeline_model :
-  def __init__(self, params = None) :
-    
-    # 전처리 파이프라인
+class PreprocessPipe :
+  def __init__(self) :
     preprocess_pipe = Pipeline([
       ('feature_selector', VolTempSelector('M')),
       ('missing_value', handleMissingValue()),
@@ -109,3 +106,11 @@ class pipeline_model :
       ('pca', PCA(n_components = 3)),
       ('component_selector', ComponentSelector(3))
     ])
+
+    self.pp = preprocess_pipe
+
+  def fit(self, X, y = None) :
+    return self.pp.fit(X)
+
+  def transform(self, X) :
+    return self.pp.transform(X)
