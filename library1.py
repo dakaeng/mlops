@@ -97,7 +97,7 @@ class ComponentSelector(BaseEstimator, TransformerMixin) :
 
 
 
-class PreprocessPipe :
+class PreprocessPipe(BaseEstimator, TransformerMixin) :
   def __init__(self) :
     preprocess_pipe = Pipeline([
       ('feature_selector', VolTempSelector('M')),
